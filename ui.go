@@ -706,6 +706,8 @@ MainLoop:
 		}
 	}
 
+	s.WriteNotifySocket("xmpp-client died")
+
 	os.Stdout.Write([]byte("\n"))
 }
 
@@ -982,20 +984,27 @@ func (s *Session) processClientMessage(stanza *xmpp.ClientMessage) {
 	if s.config.Bell {
 		line = append(line, '\a')
 	}
+	s.term.Write(line)
+
+	if len(message) > s.config.NotifyMaxMsgLength {
+		message = message[:s.config.NotifyMaxMsgLength] + "[...]"
+	}
+	notifyLine := fmt.Sprintf("%s  @%s", message, strings.Split(from, "@")[0])
+	s.WriteNotifySocket(notifyLine)
+
+	s.maybeNotify()
+}
+
+func (s *Session) WriteNotifySocket(notifyLine string) {
 	if s.config.NotifySocket != "" {
 		c, err := net.Dial("unix", s.config.NotifySocket)
 		if err != nil {
 			alert(s.term, fmt.Sprintf("Unable to connect to notify socket: %v", err))
 		}
 		defer c.Close()
-		if len(message) > s.config.NotifyMaxMsgLength {
-			message = message[:s.config.NotifyMaxMsgLength] + "[...]"
-		}
-		notifyLine := fmt.Sprintf("%s  @%s", message, strings.Split(from, "@")[0])
 		c.Write([]byte(notifyLine))
 	}
-	s.term.Write(line)
-	s.maybeNotify()
+
 }
 
 func (s *Session) maybeNotify() {

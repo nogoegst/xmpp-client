@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/url"
 	"os"
 	"os/exec"
@@ -975,10 +976,23 @@ func (s *Session) processClientMessage(stanza *xmpp.ClientMessage) {
 	t := fmt.Sprintf("(%s) %s: ", timestamp, from)
 	line = append(line, []byte(t)...)
 	line = append(line, s.term.Escape.Reset...)
-	line = appendTerminalEscaped(line, stripHTML(out))
+	message := string(stripHTML(out))
+	line = appendTerminalEscaped(line, []byte(message))
 	line = append(line, '\n')
 	if s.config.Bell {
 		line = append(line, '\a')
+	}
+	if s.config.NotifySocket != "" {
+		c, err := net.Dial("unix", s.config.NotifySocket)
+		if err != nil {
+			alert(s.term, fmt.Sprintf("Unable to connect to notify socket: %v", err))
+		}
+		defer c.Close()
+		if len(message) > s.config.NotifyMaxMsgLength {
+			message = message[:s.config.NotifyMaxMsgLength] + "[...]"
+		}
+		notifyLine := fmt.Sprintf("%s  @%s", message, strings.Split(from, "@")[0])
+		c.Write([]byte(notifyLine))
 	}
 	s.term.Write(line)
 	s.maybeNotify()

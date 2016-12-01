@@ -32,6 +32,8 @@ type Config struct {
 	IdleSecondsBeforeNotification int      `json:",omitempty"`
 	Bell                          bool
 	HideStatusUpdates             bool
+	NotifySocket                  string   `json:",omitempty"`
+	NotifyMaxMsgLength            int      `json:",omitempty"`
 	UseTor                        bool
 	OTRAutoTearDown               bool
 	OTRAutoAppendTag              bool

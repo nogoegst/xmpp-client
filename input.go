@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"golang.org/x/crypto/ssh/terminal"
+	"github.com/nogoegst/terminal"
 )
 
 type uiCommand struct {

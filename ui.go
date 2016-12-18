@@ -26,7 +26,7 @@ import (
 
 	"github.com/agl/xmpp-client/xmpp"
 	"golang.org/x/crypto/otr"
-	"golang.org/x/crypto/ssh/terminal"
+	"github.com/nogoegst/terminal"
 	"golang.org/x/net/html"
 	"golang.org/x/net/proxy"
 )
@@ -199,6 +199,10 @@ func main() {
 		panic(err.Error())
 	}
 	defer terminal.Restore(0, oldState)
+	err = terminal.EnableOPOST(0)
+	if err != nil {
+		panic(err.Error())
+	}
 	term := terminal.NewTerminal(os.Stdin, "")
 	updateTerminalSize(term)
 	term.SetBracketedPasteMode(true)

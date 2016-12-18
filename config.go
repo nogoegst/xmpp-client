@@ -13,7 +13,7 @@ import (
 
 	"github.com/agl/xmpp-client/xmpp"
 	"golang.org/x/crypto/otr"
-	"golang.org/x/crypto/ssh/terminal"
+	"github.com/nogoegst/terminal"
 	"golang.org/x/net/proxy"
 )
 

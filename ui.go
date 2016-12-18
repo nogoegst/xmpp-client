@@ -993,7 +993,7 @@ func (s *Session) processClientMessage(stanza *xmpp.ClientMessage) {
 	if len(message) > s.config.NotifyMaxMsgLength {
 		message = message[:s.config.NotifyMaxMsgLength] + "[...]"
 	}
-	notifyLine := fmt.Sprintf("%s  @%s", message, strings.Split(from, "@")[0])
+	notifyLine := fmt.Sprintf("%s @%s", message, strings.Split(from, "@")[0])
 	s.WriteNotifySocket(notifyLine)
 
 	s.maybeNotify()
